@@ -1,0 +1,18 @@
+3.28e-3		;	k_d_IT			
+0		;	h_b_IT			
+1.6		;	m_w_IT			
+2.92		;	beta			
+0.004489	;	k_d_SD			
+0		;	h_b_SD			
+0.04609		;	b_w			
+1.083		;	m_w_SD		
+0		;	c0	feeding		
+0		;	cT	feeding		
+1e-6		;	c0	somatic	maintenance	
+2.599		;	cT	somatic	maintenance	
+1e-6		;	c0	maturity	maintenance	
+0.0372		;	cT	maturity	maintenance	
+0		;	c0	cost	egg	
+0		;	cT	cost	egg	
+1e-6		;	c0	hazard	oogenesis	
+0.1802		;	cT	hazard	oogenesis	

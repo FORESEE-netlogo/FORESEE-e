@@ -1,0 +1,38 @@
+"endogeic";	eco-type: one of "anecic", "endogeic" or "epigeic"		
+True    ;	undergoes diapause?			
+0	;	minimal days in diapause			
+0.73733	;	b_diapause; if worm does not go into diapause, this value is ignored			
+65.8979	;	F_m0			
+8.69	;	m_0			
+77.8891	;	b_max			
+5.6028	;	k_b			
+0.258	;	kap_X			
+100.7201;	HSK, if not calibrated: HSK = p_Am / kap_X / F_m
+1680.1	;	p_M			
+0.018505;	v			
+0.002793;	k_J			
+1712.41	;	p_Am			
+0.4373	;	kap			
+6880.3	;	E_G			
+1167	;	E_Hp			
+20.63	;	E_Hb			
+0.475	;	kap_R			
+0.0788	;	UE_0			
+0.066193;	del_M			
+0.2631	;	d_V			
+23.9	;	w_E			
+550000	;	mu_E			
+0.0001	;	s_g			
+3.25E-07;	h_a			
+39.6592	;	t_0			
+7976	;	T_A			
+293.2	;	T_H			
+2.875E4	;	T_AH			
+293.15	;	T_ref			
+0.1019	;	L_0			
+1	;	average	eggs	per	cocoon
+1.5	;	cone-distance			
+90	;	cone-angle-burrow			
+90	;	cone-angle-litter; if worm is not anecic, this value is ignored and only the "cone-angle-burrow" used			
+0	;	min-distance-between-burrows; if worm is not anecic, this value is ignored		
+0.005	;	rate-desication	

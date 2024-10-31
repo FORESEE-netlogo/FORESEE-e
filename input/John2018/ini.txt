@@ -1,0 +1,4 @@
+"Rothamsted"
+52	; latitude
+1	; initial day of the year (01.01. = 1)
+257	; start-plot: run model to this day before plots start

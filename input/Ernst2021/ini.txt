@@ -1,0 +1,4 @@
+"Wurzen"
+51	; latitude
+305	; initial day of the year (01.01. = 1)
+0	; start-plot: run model to this day before plots start
