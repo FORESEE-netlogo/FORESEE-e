@@ -51,9 +51,6 @@ globals [
   death-tox
   emigration
 
-  total-eggs
-  viable-eggs
-
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;          Animal parameters              ;
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -89,8 +86,6 @@ globals [
   d_V                  ; g/cm^3   ; specific density of structure
   w_E                  ; g/mol    ; mol-weights for (unhydrated) org. compounds: Reserve
   mu_E                 ; J/mol    ; chemical potential of reserve
-  w                    ; g/cm^3   ; contribution of reserve to body fresh weight
-  w_V                  ; g/cm^3   ; contribution of water replacement to body fresh weight
   T_A                  ; K        ; Arrhenius temperature
   T_H                  ; K        ; Upper boundary temperature
   T_AH                 ; K        ; Arrhenius temperature for the rate of decrease at upper boundary
@@ -228,9 +223,6 @@ eggs-own [
   ;           Daily procedures                                                                                                                          ;
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 to go
-  ;; reset global counters
-  set total-eggs 0
-  set viable-eggs 0
 
   ;; update patches and calendar
   env-module
@@ -290,10 +282,7 @@ to animals-daily
     if substance and D_i > 0 [do-td]
 
     ;; death due to desiccation
-    let factor-H 1
-    ;; juveniles reach vital limit of desiccation 2x faster than adults according to Grant 1955
-    ;if breed = juveniles [ set factor-H 2]
-    if M < m_0 and random-float 1 < rate-desic * factor-H [
+    if M < m_0 and random-float 1 < rate-desic [
       set alive false
       set death-dessication death-dessication + 1
       die
@@ -356,8 +345,8 @@ end
 
 to development-eggs
   ask eggs [
-    ;; death rate of cocoons is 3 times as high as for worms, based on an LD50 of -10000kPa for cocoons (Holmstrup & Westh 1995) vs an LD50 of 30000kPa for adult worms (Friis et al. 2004)
-    if [moisture] of patch-here <= m_0 and random-float 1 < rate-desic * 3 [ die ];3
+    ;; death rate of cocoons is 3 times as high as for worms, based on an LD50 of -10000kPa for cocoons (Holmstrup & Westh 1995) vs an LD50 of -30000kPa for adult worms (Friis et al. 2004)
+    if [moisture] of patch-here <= m_0 and random-float 1 < rate-desic * 3 [ die ]
 
     ;; if maturity at birth is reached, release juveniles
     if H >= E_hb [
@@ -597,7 +586,7 @@ to do-deb
   ]
 
   ;; scaled reserve density between 0 = no energy and 1 = full energy
-  set e_scal E_ * v0 / (L ^ 3 * p_Am0)
+  if breed != eggs [set e_scal min list 1 (E_ * v0 / (L ^ 3 * p_Am0))]
 
   ;; DEB-calculations (diapausing worms pay somatic maintenance costs only)
   ;; fluxes
@@ -630,7 +619,7 @@ to do-deb
   set dL    L * r / 3
   set L     L + dL
 
-  ;; starvation rule from Alice models: if worms become smaller than they were at birth -> die
+  ;; starvation rule from Johnston models: if worms become smaller than they were at birth -> die
   if breed != eggs and L < L_0-ind [
     set alive False
     set death-starvation death-starvation + 1
@@ -661,7 +650,7 @@ to do-deb
     ]
     set dE_R kap_R * pR
     set E_R ( E_R + dE_R )
-    do-repro
+    if not diapause [do-repro]
   ]
   set R_    E_R / E_0
 
@@ -732,7 +721,7 @@ to ageing
 end
 
 to crowding-stress
-  ;; Following crowding-stress from EEEWorm L. terrestris
+  ;; Following crowding-stress from EEEWorm for L. terrestris (Johnston et al. 2018)
   ifelse eco-type = "anecic" [
     ;; other worms in burrow lead to increased mortality
     let my-xcor xcor
@@ -742,7 +731,7 @@ to crowding-stress
     ]
   ][
     ;; other worms in-radius lead to increased mortality
-    if random-float 100 < (count (other (turtle-set juveniles adults) in-radius 10) * 1 / 100) [
+    if random-float 100 < (count (other (turtle-set juveniles adults) with [not diapause] in-radius 10) * 1 / 100) [
       set death-crowding death-crowding + 1
       die
     ]
@@ -750,6 +739,7 @@ to crowding-stress
 end
 
 to predation
+  ;; Following predation from EEEWorm for L. terrestris (Johnston et al. 2018)
   if hours-of-day <= round photoperiod and ycor > -5 and random-float 100 < (count other (turtle-set juveniles adults) / width-environment  * 0.5 / 100 * L / L_i) [
     set death-predation death-predation + 1
     die
@@ -1138,6 +1128,7 @@ to setup-worms
   set-default-shape juveniles "juvWorm"
   set-default-shape adults "aduworm"
 
+  ;; set-up of juveniles
   let rn-juv num-juv * width-environment; max list 0 (random-normal num-juv (num-juv / 5))
   let rn-adu num-adults * width-environment;max list 0 (random-normal num-adults (num-adults / 5))
   if eco-type = "anecic" [ set rn-adu min list rn-adu length xcors-existing-burrows ]
@@ -1174,6 +1165,7 @@ to setup-worms
     set size L / del_M
   ]
 
+  ;; set-up of adults
   create-juveniles rn-adu * 10 [
     set D_i 0
     (ifelse eco-type = "endogeic" [
@@ -1190,20 +1182,26 @@ to setup-worms
     initial-values
     set age 1
     ;; if starting with a mixed population, worms grow up to a random size between length at birth and ultimate length
-    set TC_mean temp-corr (min temperature-data + K_conv)
+    set TC_mean temp-corr ([temperature] of patch-here + K_conv)
     set M [moisture] of patch-here
     set E_     p_Am0 / v0 * L ^ 3   ; maximal reserve at birth (rather than E_0)
     set l_0-ind l
-    let l-ini random-float (f * l_i)
     set time-since-last-mating 365
-    while [L < l-ini] [
+    while [H < E_hp] [
       set p_A p_Am0 * L ^ 2 * f
       do-deb
+      set age age + 1
+    ]
+    let age-ini age + random 50
+    while [age < age-ini] [
+      set p_A p_Am0 * L ^ 2 * f
+      do-deb
+      set age age + 1
     ]
     set H E_hp
     set breed adults
-    set repro 0
-    set time-since-last-mating random (7 * 30)
+    set color 135
+    set time-since-last-mating random (8 * 30)
     set TC_mean temp-corr ([temperature] of patch-here + K_conv)
     burrow-activity
     set size L / del_M
@@ -1301,7 +1299,7 @@ to setup-colordata
     set color-minT -20; min temperature-data ;- 10          ; reports minimum value of list - WORKS !
 
     set color-maxTh max theta-data * 100
-    set color-minTh min theta-data * 100
+    set color-minTh 0
 
     set color-maxOM 10
     set color-minOM 0
@@ -1441,7 +1439,6 @@ to setup-ernst2021
     set ww-juv 1.5
     set ww-adu 4.3
     set min-distance-between-burrows 20
-    set rate-desic 0.0005
   ] species = "A. caliginosa" [
     set num-adults 33
     set num-juv 169
