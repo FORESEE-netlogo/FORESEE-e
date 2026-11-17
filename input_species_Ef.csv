@@ -1,0 +1,40 @@
+eco-type,epigeic,"eco-type: one of 'anecic', 'endogeic' or 'epigeic'"
+species-group,earthworm,species group can be 'earthworm' or 'collembola'
+deb-model-type,std,typified DEB model used; supported models are 'std' and 'abj'
+undergoes-diapause,false,undergoes diapause?
+min-days-diapause,0,minimal days in diapause [d]
+b_diapause,0.78,"distribution width for diapause [1/%]; if worm does not go into diapause, this value is ignored"
+F_m,6.5,"max size-specific searching rate [L/(cm^2 d)]; value taken from A. caliginosa"
+m_0,8.69,moisture threshold for movement [%]
+b_max,87.98,maximum moisture-dependent specific movement rate [cm soil/(d % cm^2)]
+k_b,6.205,moisture-dependent specific movement rate  [cm soil/(d % cm^2)]
+kap_X,0.8,assimilation efficiency [-]
+HSK,1690.07,half-saturation constant for food uptake; if not calibrated directly: HSK = p_Am / kap_X / F_m
+p_M,5575,volume-specific maintenance costs [J/cm]
+v,0.009089,conductance rate [cm/d]
+k_J,0.002,maturity maintenance rate constant [d^-1]
+p_Am,8788.37,maximum size-specific assimilation rate [J/(cm^2 d)]
+kap,0.1296,somatic investment ratio
+E_G,4183,costs for structure [J/cm^3]
+E_Hp,2312,maturity at puberty [J]
+E_Hb,6.686,maturity at birth [J]
+kap_R,0.475,reproduction efficiency [-]
+U_E0,0.0058,scaled initial reserves [cm^2?]
+del_M,0.02876,shape coefficient [-]
+d_V,0.16,specific density of structure [g/cm^3]
+w_E,23.9,mol-weights for (unhydrated) org. compounds in reserve [g/mol]
+mu_E,550000,chemical potential of reserve [J/mol]
+s_G,0.0001,Gompertz aging stress coefficient [-]
+h_a,1.58e-8,aging acceleration [d^-2]
+t_0,0,dormancy of cocoon [d]
+T_A,8000,Arrhenius temperature [K]
+T_H,1,Upper temperature boundary [K]
+T_AH,0,Arrhenius temperature for upper boundary [K]
+T_ref,293.15,reference temperature [K]; should always be at 20 °C
+L_0,0.0355,structural length at birth
+ave-eggs,2.7,average no. of eggs per cocoon [#]
+cone-distance,1.5,distance of a worm's vision cone [cm]
+cone-angle-burrow,150,angle of vision [°]
+cone-angle-litter,150,"cone-angle-litter; if worm is not anecic, this value is ignored and only the 'cone-angle-burrow' is used"
+min-distance-between-burrows,0,"minimal distance between burrows [cm]; if worm is not anecic, this value is ignored"
+rate-desic,0.001,desiccation rate [d^-1]
